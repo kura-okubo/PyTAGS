@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 #######################################################################
 #PyTAGS - A Python package for the Temporal Analysis of GNSS Strains
-#Inversion of interseismic GPS displacement or velocities for strain 
+#Inversion of interseismic GPS displacement or velocities for strain
 #and translation in grid or in triangulated subnetworks
 #Written by Brendan Crowell, University of Washington
 #v1.0, last modified November 7, 2017
@@ -68,7 +68,7 @@ if int(temporalmode) == 0:
             ndays = ndays+366
         else:
             ndays = ndays+365
-            
+
 
     isleap = calendar.isleap(int(startyear))
     if str(isleap) == 'True':
@@ -114,7 +114,7 @@ with open(sitefile, 'rt') as f:
             site = row[7]
             sites.append(str.lower(site))
             if int(temporalmode) == 0:
-            
+
                 if datasource == 'sopac':
                     GPSfile = datadir + str.lower(site) + datasuffix
                     filetest = Path(GPSfile)
@@ -130,7 +130,13 @@ with open(sitefile, 'rt') as f:
                                     north = float(grow[3])
                                     east = float(grow[4])
 
-                                    a1 = numpy.where((int(ygps) == YMAT) & (int(dgps) == DMAT))[0]
+                                    #--------------------------------------------------------------------------#
+                                    # Need to follow the count of date (e.g. from 001 to 365) in the input file.
+                                    # 2023.1.23 Kurama Okubo
+                                    # a1 = numpy.where((int(ygps) == YMAT) & (int(dgps) == DMAT))[0]
+                                    a1 = numpy.where((int(ygps) == YMAT) & (int(dgps)-1 == DMAT))[0]
+                                    #--------------------------------------------------------------------------#
+
                                     a1 = numpy.array(a1)
                                     if len(a1) > 0:
                                         N[a1[0],k] = north/1000
@@ -149,7 +155,7 @@ with open(sitefile, 'rt') as f:
                             rows = (line.split() for line in g)
                             for grow in rows:
                                 if grow[0].isdigit():
-                                    
+
                                     mjd = float(grow[2])
                                     mjd_1 = datetime(1858,11,17,0,0,0)+timedelta(days=mjd)
                                     tt = mjd_1.timetuple()
@@ -176,7 +182,7 @@ with open(sitefile, 'rt') as f:
                                 rows = (line.split() for line in g)
                                 for grow in rows:
                                     if grow[0].isdigit():
-                                        
+
                                         mjd = float(grow[2])
                                         mjd_1 = datetime(1858,11,17,0,0,0)+timedelta(days=mjd)
                                         tt = mjd_1.timetuple()
@@ -198,8 +204,8 @@ with open(sitefile, 'rt') as f:
             elif int(temporalmode) == 1:
                 E[k,0] = row[2]
                 N[k,0] = row[3]
-                
-        
+
+
             k=k+1
 
 
@@ -211,7 +217,7 @@ if int(strainmode) == 0:
     print ("Delaunay triangulating stations")
     [triangles,tri_length] = triangulate(sta_lon,sta_lat,props)
 
-    
+
     sta_lat1 = numpy.zeros([tri_length,1])
     sta_lon1 = numpy.zeros([tri_length,1])
 
@@ -226,7 +232,7 @@ if int(strainmode) == 0:
 
     for i in range (0,tri_length):
         ind1 = triangles[i,1]
-        
+
         sta_lat1[i,0] = sta_lat[triangles[i,0],0]
         sta_lat2[i,0] = sta_lat[triangles[i,1],0]
         sta_lat3[i,0] = sta_lat[triangles[i,2],0]
@@ -256,7 +262,7 @@ if int(strainmode) == 0:
             sta1.append(str.lower(sites[ind1]))
             sta2.append(str.lower(sites[ind2]))
             sta3.append(str.lower(sites[ind3]))
-            
+
             for j in range (0, ndays):
                 N1[j,i]=N[j,ind1]
                 N2[j,i]=N[j,ind2]
@@ -265,7 +271,7 @@ if int(strainmode) == 0:
                 E1[j,i]=E[j,ind1]
                 E2[j,i]=E[j,ind2]
                 E3[j,i]=E[j,ind3]
-                
+
         print ("Beginning strain calculations for", tri_length, "trianglular subnetworks")
         subnet_outfile = 'output/subnetworks_triangulated_overview.txt'
         fstrain_subnetworks = open(subnet_outfile,'w')
@@ -313,7 +319,7 @@ if int(strainmode) == 0:
             fstrain.write('##########################################################################'+'\n')
 
             fstrain_subnetworks.write(sta1[i]+' '+lonp0+' '+latp0+' '+sta2[i]+' '+lonp1+' '+latp1+' '+sta3[i]+' '+lonp2+' '+latp2+' '+'\n')
-           
+
             for j in range (0, ndays):
                 if (math.isnan(N1[j,i]) == False and math.isnan(N2[j,i]) == False and math.isnan(N3[j,i]) == False):
                     n0 = N1[j,i]
@@ -321,12 +327,12 @@ if int(strainmode) == 0:
 
                     n1 = N2[j,i]
                     e1 = E2[j,i]
-                    
+
                     n2 = N3[j,i]
                     e2 = E3[j,i]
 
                     L = strain_tri(lon0,lat0,lon1,lat1,lon2,lat2,n0,e0,n1,e1,n2,e2)
-                   
+
                     isleap = calendar.isleap(int(YMAT[j,0]))
                     if str(isleap) == 'True':
                         DTIME = YMAT[j,0] + (DMAT[j,0]+0.5)/366
@@ -335,7 +341,7 @@ if int(strainmode) == 0:
                     timestr = "{0:.4f}".format(float(DTIME))
                     yearstr = "{0:.0f}".format(float(YMAT[j,0]))
                     daystr = "{0:.0f}".format(float(DMAT[j,0]))
-                    
+
                     e1str = "{0:.4e}".format(float(L[0]))
                     e2str = "{0:.4e}".format(float(L[1]))
                     eenstr = "{0:.4e}".format(float(L[2]))
@@ -345,7 +351,7 @@ if int(strainmode) == 0:
                     fstrain.write(yearstr+' '+daystr+' '+timestr+' '+e1str+' '+e2str+' '+eenstr+' '+wstr+' '+thetastr+'\n')
             fstrain.close()
         fstrain_subnetworks.close()
-        
+
     elif int(temporalmode) == 1:
         N1 = numpy.nan*numpy.ones([tri_length,1])
         E1 = numpy.nan*numpy.ones([tri_length,1])
@@ -372,7 +378,7 @@ if int(strainmode) == 0:
             E1[i,0]=E[ind1,0]
             E2[i,0]=E[ind2,0]
             E3[i,0]=E[ind3,0]
-            
+
         print ("Beginning strain calculations for", tri_length, "trianglular subnetworks")
         outfile = 'output/strain_triangulated_staticmode.txt'
         fstrain = open(outfile,'w')
@@ -404,12 +410,12 @@ if int(strainmode) == 0:
 
                 n1 = N2[i,0]
                 e1 = E2[i,0]
-                
+
                 n2 = N3[i,0]
                 e2 = E3[i,0]
 
-                L = strain_tri(lon0,lat0,lon1,lat1,lon2,lat2,n0,e0,n1,e1,n2,e2)                  
-            
+                L = strain_tri(lon0,lat0,lon1,lat1,lon2,lat2,n0,e0,n1,e1,n2,e2)
+
 
                 e1str = "{0:.4e}".format(float(L[0]))
                 e2str = "{0:.4e}".format(float(L[1]))
@@ -420,7 +426,7 @@ if int(strainmode) == 0:
 
                 fstrain.write(sta1[i]+' '+lonp0+' '+latp0+' '+sta2[i]+' '+lonp1+' '+latp1+' '+sta3[i]+' '+lonp2+' '+latp2+' '+e1str+' '+e2str+' '+eenstr+' '+wstr+' '+thetastr+'\n')
         fstrain.close()
-    
+
 #########################################################################
 ###Compute strains for grid mode
 #########################################################################
@@ -453,9 +459,9 @@ if int(strainmode) == 1:
                         DTIME = YMAT[i,0] + (DMAT[i,0]+0.5)/366
                     else:
                         DTIME = YMAT[i,0] + (DMAT[i,0]+0.5)/365
-                        
+
                     timestr = "{0:.4f}".format(float(DTIME))
-                    
+
                     yearstr = "{0:.0f}".format(float(YMAT[i,0]))
                     daystr = "{0:.0f}".format(float(DMAT[i,0]))
 
@@ -465,7 +471,7 @@ if int(strainmode) == 1:
                     e2str = "{0:.4e}".format(float(L[3]))
                     exystr = "{0:.4e}".format(float(L[4]))
                     wstr = "{0:.4e}".format(float(L[5]))
-                    theta = "{0:.2f}".format(float(L[6]*180/math.pi))                              
+                    theta = "{0:.2f}".format(float(L[6]*180/math.pi))
 
                     fstrain.write(yearstr+' '+daystr+' '+timestr+' '+lonstr+' '+latstr+' '+dxstr+' '+dystr+' '+e1str+' '+e2str+' '+exystr+' '+wstr+' '+theta+'\n')
             fstrain.close()
@@ -485,7 +491,7 @@ if int(strainmode) == 1:
                 ed = E[a1,0]
 
                 L = strain(xs,ys,ed,nd,props)
-                
+
 
                 latstr = "{0:.4f}".format(float(LATS[j,0]))
                 lonstr = "{0:.4f}".format(float(LONS[j,0]))
@@ -496,10 +502,7 @@ if int(strainmode) == 1:
                 exystr = "{0:.4e}".format(float(L[4]))
                 wstr = "{0:.4e}".format(float(L[5]))
                 theta = "{0:.2f}".format(float(L[6]*180/math.pi))
-                            
+
 
                 fstrain.write(lonstr+' '+latstr+' '+dxstr+' '+dystr+' '+e1str+' '+e2str+' '+exystr+' '+wstr+'\n')
         fstrain.close()
-
-
-
