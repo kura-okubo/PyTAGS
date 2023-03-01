@@ -130,7 +130,8 @@ with open(sitefile, 'rt') as f:
                                     north = float(grow[3])
                                     east = float(grow[4])
 
-                                    a1 = numpy.where((int(ygps) == YMAT) & (int(dgps) == DMAT))[0]
+                                    # a1 = numpy.where((int(ygps) == YMAT) & (int(dgps) == DMAT))[0]
+                                    a1 = numpy.where((int(ygps) == YMAT) & (int(dgps)-1 == DMAT))[0]
                                     a1 = numpy.array(a1)
                                     if len(a1) > 0:
                                         N[a1[0],k] = north/1000
