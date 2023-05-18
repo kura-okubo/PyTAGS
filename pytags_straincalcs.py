@@ -34,7 +34,7 @@ def strain(x, y, e, n, props):
 
                 W[2*i+1,0] = w
 
-                
+
         L = numpy.linalg.lstsq(G,numpy.multiply(W,U))[0]
         dx = L[0]
         dy = L[1]
@@ -104,5 +104,4 @@ def strain_tri(lon0,lat0,lon1,lat1,lon2,lat2,n0,e0,n1,e1,n2,e2):
         if (theta < 0):
                 theta = math.pi+theta
 
-        return (e1,e2,Een,theta,w)
-
+        return (e1,e2,Een,theta,w, Eee, Enn)
