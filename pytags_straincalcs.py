@@ -104,4 +104,19 @@ def strain_tri(lon0,lat0,lon1,lat1,lon2,lat2,n0,e0,n1,e1,n2,e2):
         if (theta < 0):
                 theta = math.pi+theta
 
-        return (e1,e2,Een,theta,w, Eee, Enn)
+        # UPDATE: compute SHmax and maximum compressive strain
+        # compute the pricipal orientation
+        theta_p = 0.5*numpy.arctan2(2*Een, (Eee - Enn))
+        theta_pdeg = numpy.rad2deg(theta_p)
+        # SHmax is orthogonal to the principal axis corresponding to the maximum extensive strain
+        theta_SHmax = theta_pdeg + 90
+        if numpy.abs(theta_SHmax - 180) < 1e-12:
+            theta_SHmax = 0 # unify the zero and 180 degrees to zero.
+
+        # print(f"theta_principal:{theta_p:.4f} theta_SHmax:{theta_SHmax:.4f}")
+        # compute the maximum compressive strain
+        # e_SHmax = compute_axialstrain(Eee, Enn, Een, theta_SHmax)
+        theta_SHmax_rad = numpy.deg2rad(theta_SHmax)
+        e_SHmax = Eee*numpy.cos(theta_SHmax_rad)**2 + Een*numpy.sin(2*theta_SHmax_rad) + Enn*numpy.sin(theta_SHmax_rad)**2
+
+        return (e1,e2,Een,theta,w, Eee, Enn, theta_SHmax, e_SHmax)

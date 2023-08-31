@@ -315,7 +315,7 @@ if int(strainmode) == 0:
             fstrain.write('#'+'Station3'+' '+sta3[i]+'\n')
             fstrain.write('#'+'Lon3'+' '+lonp2+'\n')
             fstrain.write('#'+'Lat3'+' '+latp2+'\n')
-            fstrain.write('#'+'Year'+' '+'DOY'+' '+'Decimal time'+' '+'E1'+' '+'E2'+' '+'Een'+' '+'w'+' '+'theta'+' '+'Eee'+' '+'Enn'+'\n')
+            fstrain.write('#'+'Year'+' '+'DOY'+' '+'Decimal time'+' '+'E1'+' '+'E2'+' '+'Een'+' '+'w'+' '+'theta'+' '+'Eee'+' '+'Enn'+' '+'theta_SHmax'+' '+'e_SHmax'+'\n')
             fstrain.write('##########################################################################'+'\n')
 
             fstrain_subnetworks.write(sta1[i]+' '+lonp0+' '+latp0+' '+sta2[i]+' '+lonp1+' '+latp1+' '+sta3[i]+' '+lonp2+' '+latp2+' '+'\n')
@@ -349,8 +349,10 @@ if int(strainmode) == 0:
                     thetastr = "{0:.2f}".format(float(L[3]*180/math.pi))
                     Eeestr = "{0:.4e}".format(float(L[5]))
                     Ennstr = "{0:.4e}".format(float(L[6]))
+                    theta_SHmaxstr = "{0:.2f}".format(float(L[7]))
+                    e_SHmax = "{0:.4e}".format(float(L[8]))
 
-                    fstrain.write(yearstr+' '+daystr+' '+timestr+' '+e1str+' '+e2str+' '+eenstr+' '+wstr+' '+thetastr+' '+Eeestr+' '+Ennstr+'\n')
+                    fstrain.write(yearstr+' '+daystr+' '+timestr+' '+e1str+' '+e2str+' '+eenstr+' '+wstr+' '+thetastr+' '+Eeestr+' '+Ennstr+' '+theta_SHmaxstr+' '+e_SHmax+'\n')
             fstrain.close()
         fstrain_subnetworks.close()
 
